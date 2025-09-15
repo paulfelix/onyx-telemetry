@@ -1,21 +1,23 @@
 import { useContext } from 'react';
 import TimeseriesChart from '@components/TimeseriesChart'
-import { AppContext } from '@utils/appContext';
-import { groupBy, startCase } from 'lodash';
+import { AppContext } from '@/appContext';
+import { toTitleCase } from '@/utils/stringUtils';
+import { getSortedDataTypes } from '@/utils/dataUtils';
 
-const dataTypes = ['throttle', 'brake', 'current', 'PowerOutput', 'speed', 'motorTemp', 'controllerTemp', 'voltage'];
 
 function ReportCharts() {
   const contextValue = useContext(AppContext);
-  const groupedLogs = contextValue?.userData ? groupBy(contextValue.userData.logs, 'type') : {};
-  const sortedLogs = dataTypes
-    .filter((dataType) => dataType in groupedLogs)
-    .map((dataType) => [dataType, groupedLogs[dataType]]);
-  const sortedTimeseries = sortedLogs.map((log: any[]) => {
-    const label =  startCase(log[0].replace(/([A-Z])/g, " $1"));
+  if (!contextValue?.userData) {
+    return null;
+  }
+  const groupedLogs = contextValue?.userData?.groupedLogs;
+  const sortedDataTypes: string[] = contextValue.settings?.selectedDataTypes ?? getSortedDataTypes(groupedLogs);
+  const sortedTimeseries = sortedDataTypes.map(dataType => {
+    const label =  toTitleCase(dataType);
     const timeseries = [['time', label]];
-    log[1].forEach((entry: Record<string, any>) =>
-      timeseries.push([new Date(entry.timestamp), entry.value]));
+    groupedLogs[dataType].forEach((entry: Record<string, any>) => {
+      timeseries.push([new Date(entry.timestamp), entry.value]);
+    })
     return timeseries;
   });
 

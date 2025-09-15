@@ -1,6 +1,10 @@
-@import 'uikit/src/scss/variables-theme.scss';
-@import 'uikit/src/scss/mixins-theme.scss';
-@import 'uikit/src/scss/uikit-theme.scss';
+@import 'uikit/src/scss/variables.scss';
+@import 'uikit/src/scss/mixins.scss';
+
+$offcanvas-bar-background: #fff;
+$offcanvas-bar-color-mode: none;
+
+@import 'uikit/src/scss/uikit.scss';
 
 #root {
   margin: 0 auto;

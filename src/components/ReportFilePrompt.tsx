@@ -1,27 +1,30 @@
-import { AppContext } from '@/utils/appContext';
+import { AppContext } from '@/appContext';
+import { groupBy } from 'lodash';
 import { useContext } from 'react';
+import { useFilePicker } from 'use-file-picker';
 
 function ReportFilePrompt() {
   const contextValue = useContext(AppContext);
+  const { openFilePicker, loading } = useFilePicker({
+    accept: '.json',
+    onFilesSuccessfullySelected: ({ plainFiles, filesContent }: any) => {
+      const userData = JSON.parse(filesContent[0].content);
+      userData.filename = plainFiles[0].name;
+      userData.groupedLogs = groupBy(userData.logs, 'type');
+      delete userData.logs;
+      contextValue?.setUserData(userData);
+    },
+  });
 
-  const onFileChange = (event: any) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const userData = JSON.parse(e.target.result);
-        userData.filename = file.name;
-        contextValue?.setUserData(userData);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  console.log('prompt');
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
-      <input type="file" accept=".json" onChange={onFileChange} />
+      <h4>ONYX Telemetry Analytics</h4>
+      <p>Select your recorded Qdash trip file and view an analytics report.</p>
+      <button className="uk-button uk-button-default" onClick={() => openFilePicker()}>Select Qdash File</button>
     </div>
   );
 }

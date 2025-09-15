@@ -1,7 +1,6 @@
 import { useContext } from 'react';
-import { AppContext } from '@utils/appContext';
+import { AppContext } from '@/appContext';
 import moment from 'moment';
-import { find, findLast } from 'lodash';
 
 function ReportSummary() {
   const contextValue = useContext(AppContext);
@@ -13,8 +12,9 @@ function ReportSummary() {
 
   const startTime = moment(new Date(userData.startTime)).format('LLLL');
   const endTime = moment(new Date(userData.endTime)).format('LLLL');
-  const startVoltage = find(userData.logs, entry => entry.type == 'voltage').value;
-  const endVoltage = findLast(userData.logs, entry => entry.type == 'voltage').value;
+  const voltageLog = userData.groupedLogs.voltage;
+  const startVoltage = voltageLog && voltageLog[0].value;
+  const endVoltage = voltageLog && voltageLog.at(-1).value;
 
   return (
     <>
