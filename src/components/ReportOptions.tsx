@@ -1,8 +1,7 @@
 import { AppContext } from "@/appContext";
 import { getSortedDataTypes } from "@/utils/dataUtils";
 import { toTitleCase } from "@/utils/stringUtils";
-import { omit } from "lodash";
-import { useCallback, useContext, useMemo, useState, type ChangeEventHandler } from "react";
+import { useCallback, useContext, useMemo, type ChangeEventHandler } from "react";
 
 function ReportOptions() {
   return (
