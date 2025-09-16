@@ -22,7 +22,7 @@ function ReportFilePrompt() {
 
   return (
     <div>
-      <h4>ONYX Telemetry Analytics</h4>
+      <h4>ONYX Trip Analytics</h4>
       <p>Select your recorded Qdash trip file and view an analytics report.</p>
       <button className="uk-button uk-button-default" onClick={() => openFilePicker()}>Select Qdash File</button>
     </div>
