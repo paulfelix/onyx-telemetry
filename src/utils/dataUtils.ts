@@ -19,3 +19,29 @@ export function getSortedDataTypes(groupedLogs: Record<string, any>): string[] {
   });
   return sortedDataTypes;
 }
+
+export function getMeasurementLog(groupedLogs: Record<string, any>, measurement: string) {
+  const lowercaseName = measurement.toLowerCase();
+  const match = Object.keys(groupedLogs).find(key => key.toLowerCase() == lowercaseName);
+  return match ? groupedLogs[match] : undefined;
+}
+
+export function getMeasurementUnit(measurement: string) {
+  switch(measurement.toLowerCase()) {
+    case 'controllertemp':
+    case 'motortemp':
+      return '℃';
+    case 'throttle':
+      return '%';
+    case 'poweroutput':
+      return 'kW';
+    case 'speed':
+      return 'RPM';
+    case 'current':
+      return 'A';
+    case 'voltage':
+      return 'V';
+    default:
+      return '';
+  }
+}

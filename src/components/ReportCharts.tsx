@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import TimeseriesChart from '@components/TimeseriesChart'
 import { AppContext } from '@/appContext';
 import { toTitleCase } from '@/utils/stringUtils';
-import { getSortedDataTypes } from '@/utils/dataUtils';
+import { getMeasurementUnit, getSortedDataTypes } from '@/utils/dataUtils';
 
 
 function ReportCharts() {
@@ -13,7 +13,9 @@ function ReportCharts() {
   const groupedLogs = contextValue?.userData?.groupedLogs;
   const sortedDataTypes: string[] = contextValue.settings?.selectedDataTypes ?? getSortedDataTypes(groupedLogs);
   const sortedTimeseries = sortedDataTypes.map(dataType => {
-    const label =  toTitleCase(dataType);
+    const unit = getMeasurementUnit(dataType)
+    const title = toTitleCase(dataType);
+    const label =  unit ? `${title} (${unit})` : title;
     const timeseries = [['time', label]];
     groupedLogs[dataType].forEach((entry: Record<string, any>) => {
       timeseries.push([new Date(entry.timestamp), entry.value]);
