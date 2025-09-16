@@ -9,4 +9,7 @@ export default defineConfig({
     tsconfigPaths(),
   ],
   base: '',
+  build: {
+    outDir: 'docs',
+  },
 })
