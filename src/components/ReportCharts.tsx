@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import TimeseriesChart from '@components/TimeseriesChart'
 import { AppContext } from '@/appContext';
 import { toTitleCase } from '@/utils/stringUtils';
-import { getMeasurementUnit, getSortedDataTypes } from '@/utils/dataUtils';
+import { calcMeasurementIntegral, getMeasurementIntegralUnit, getMeasurementUnit, getSortedDataTypes } from '@/utils/dataUtils';
 
 
 function ReportCharts() {
@@ -16,10 +16,33 @@ function ReportCharts() {
     const unit = getMeasurementUnit(dataType)
     const title = toTitleCase(dataType);
     const label =  unit ? `${title} (${unit})` : title;
-    const timeseries = [['time', label]];
-    groupedLogs[dataType].forEach((entry: Record<string, any>) => {
-      timeseries.push([new Date(entry.timestamp), entry.value]);
-    })
+    const labels = ['time', label];
+    const timeseries = [labels];
+    const rows = groupedLogs[dataType];
+    const integralUnit = getMeasurementIntegralUnit(dataType)
+
+    if (integralUnit) {
+      labels.push(integralUnit);
+      const integralChunk: number[] = [];
+      var integralValue = 0;
+      rows.forEach((entry: Record<string, any>, index: number) => {
+        const time = new Date(entry.timestamp);
+        integralChunk.push(entry.value);
+        if ((time.getSeconds() === 0 || index === rows.length - 1) && integralChunk.length > 10) {
+          integralValue += calcMeasurementIntegral(dataType, integralChunk);
+          integralChunk.length = 0;
+          integralChunk.push(entry.value);
+          timeseries.push([time, entry.value, integralValue]);
+
+        } else {
+          timeseries.push([time, entry.value, null]);
+        }
+      })
+    } else {
+      rows.forEach((entry: Record<string, any>) => {
+        timeseries.push([new Date(entry.timestamp), entry.value]);
+      })
+    }
     return timeseries;
   });
 

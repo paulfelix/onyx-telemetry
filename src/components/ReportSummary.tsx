@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { AppContext } from '@/appContext';
 import moment from 'moment';
 import { mean } from 'lodash';
-import { getMeasurementLog, getMeasurementUnit } from '@/utils/dataUtils';
+import { getMeasurementValues, getMeasurementUnit, calcAmpHours, calcDistance, calcWHours } from '@/utils/dataUtils';
 
 function ReportSummary() {
   const contextValue = useContext(AppContext);
@@ -14,20 +14,30 @@ function ReportSummary() {
 
   const startTime = moment(new Date(userData.startTime));
   const endTime = moment(new Date(userData.endTime));
-  const controllerTempValues = getMeasurementLog(userData.groupedLogs, 'controllerTemp').map((entry: any) => entry.value);
-  const motorTempValues = getMeasurementLog(userData.groupedLogs, 'motorTemp').map((entry: any) => entry.value);
-  const voltageValues = getMeasurementLog(userData.groupedLogs, 'voltage').map((entry: any) => entry.value);
-  const currentValues = getMeasurementLog(userData.groupedLogs, 'current').map((entry: any) => entry.value);
-  const throttleValues = getMeasurementLog(userData.groupedLogs, 'throttle').map((entry: any) => entry.value);
-  const powerValues = getMeasurementLog(userData.groupedLogs, 'powerOutput').map((entry: any) => entry.value);
-  const speedValues = getMeasurementLog(userData.groupedLogs, 'speed').map((entry: any) => entry.value);
+  const controllerTempValues = getMeasurementValues(userData.groupedLogs, 'controllerTemp');
+  const motorTempValues = getMeasurementValues(userData.groupedLogs, 'motorTemp');
+  const voltageValues = getMeasurementValues(userData.groupedLogs, 'voltage');
+  const currentValues = getMeasurementValues(userData.groupedLogs, 'current');
+  const throttleValues = getMeasurementValues(userData.groupedLogs, 'throttle');
+  const powerValues = getMeasurementValues(userData.groupedLogs, 'powerOutput');
+  const speedValues = getMeasurementValues(userData.groupedLogs, 'speed');
+  const averageSpeed = calcDistance(speedValues) * 3600 / userData.duration ;
 
   return (
     <>
       <div className="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded">
         <h5 className="uk-card-title uk-text-center uk-margin-xsmall">{startTime.format('LL')}</h5>
         <p className="uk-text-center uk-margin-xsmall">{startTime.format('LT')} - {endTime.format('LT')}</p>
-        <p className="uk-text-center uk-margin-xsmall"><span className="uk-badge" style={{height: '2em', fontSize: '1em'}}>{moment.duration(userData.duration, 'seconds').humanize()}</span></p>
+        <div className="uk-flex uk-flex-center">
+          <div className="uk-text-center uk-margin-xsmall uk-card uk-card-primary uk-card-small uk-card-body uk-border-rounded">
+              <ul className="uk-list uk-list-collapse">
+                <li>{calcDistance(speedValues).toFixed(1)} Miles in {moment.duration(userData.duration, 'seconds').humanize()}, {averageSpeed.toFixed(1)} MPH (avg)</li>
+                <li>{calcAmpHours(currentValues).toFixed(1)} AH</li>
+                <li>{calcWHours(powerValues).toFixed(1)} Wh</li>
+                <li>{voltageValues[0].toFixed(1)}V → {voltageValues[voltageValues.length-1].toFixed(1)}V</li>
+              </ul>
+          </div>
+        </div>
       </div>
       <div className="uk-flex uk-flex-around uk-flex-wrap">
         <MeasurementStats

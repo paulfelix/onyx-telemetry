@@ -7,6 +7,14 @@ type TimeseriesChartProps = {
 
 function TimeseriesChart({ data, options={} }: TimeseriesChartProps) {
     const labels: any[] = data[0] as any[];
+    const series = {
+      0: { type: 'LineChart', targetAxisIndex: 0 },
+      1: { type: 'AreaChart', targetAxisIndex: 1, curveType: 'function' }
+    };
+    const vAxes = {
+      0: { title: labels[1], titleTextStyle: { italic: false }, format: '###' },
+      1: { title: labels[2] ?? '', titleTextStyle: { italic: false }, format: '###' },
+    };
 
     const chartOptions = {
       chartArea: {
@@ -14,11 +22,8 @@ function TimeseriesChart({ data, options={} }: TimeseriesChartProps) {
         height: '80%',
       },
       legend: "none",
-      vAxis: {
-        title: labels[1],
-        titleTextStyle: { italic: false },
-        format: '###',
-      },
+      series,
+      vAxes,
       ...options,
     };
 
@@ -27,7 +32,7 @@ function TimeseriesChart({ data, options={} }: TimeseriesChartProps) {
     return (
       <div>
         <Chart
-          chartType="LineChart"
+          chartType="ComboChart"
           data={data}
           options={chartOptions}
           width="100%"
